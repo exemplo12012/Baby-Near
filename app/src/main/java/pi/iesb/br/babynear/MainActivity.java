@@ -32,17 +32,15 @@ public class MainActivity extends AppCompatActivity implements Serializable {
 
   private static final long serialVersionUID = -5726768658971273029L;
 
-  ListView listViewPaired;
   ListView listViewDetected;
   ArrayList<String> arrayListpaired;
   Button buttonSearch, buttonOn, buttonOff;
-  ArrayAdapter<String> adapter, detectedAdapter;
+  ArrayAdapter<String> detectedAdapter;
   static HandleSeacrh handleSeacrh;
   BluetoothDevice bdDevice;
   BluetoothClass bdClass;
   ArrayList<BluetoothDevice> arrayListPairedBluetoothDevices;
   private ButtonClicked clicked;
-  ListItemClickedonPaired listItemClickedonPaired;
   BluetoothAdapter bluetoothAdapter = null;
   ArrayList<BluetoothDevice> arrayListBluetoothDevices = null;
   ListItemClicked listItemClicked;
@@ -54,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements Serializable {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     listViewDetected = (ListView) findViewById(R.id.listViewDetected);
-    listViewPaired = (ListView) findViewById(R.id.listViewPaired);
     buttonSearch = (Button) findViewById(R.id.buttonSearch);
     buttonOn = (Button) findViewById(R.id.buttonOn);
     buttonOff = (Button) findViewById(R.id.buttonOff);
@@ -67,14 +64,11 @@ public class MainActivity extends AppCompatActivity implements Serializable {
      * the above declaration is just for getting the paired bluetooth devices;
      * this helps in the removing the bond between paired devices.
      */
-    listItemClickedonPaired = new ListItemClickedonPaired();
     arrayListBluetoothDevices = new ArrayList<BluetoothDevice>();
-    adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, arrayListpaired);
     detectedAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_single_choice);
     listViewDetected.setAdapter(detectedAdapter);
     listItemClicked = new ListItemClicked();
     detectedAdapter.notifyDataSetChanged();
-    listViewPaired.setAdapter(adapter);
   }
 
   @Override
@@ -89,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
     if (permissionCheck != 0) {
 
       this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,
-          Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.BLUETOOTH_PRIVILEGED}, 1001); //Any number
+        Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.BLUETOOTH_PRIVILEGED}, 1001); //Any number
     }
 
     if (!bluetoothAdapter.isEnabled()) {
@@ -97,30 +91,17 @@ public class MainActivity extends AppCompatActivity implements Serializable {
       startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
     }
 
-    getPairedDevices();
     buttonOn.setOnClickListener(clicked);
     buttonSearch.setOnClickListener(clicked);
     buttonOff.setOnClickListener(clicked);
     listViewDetected.setOnItemClickListener(listItemClicked);
-    listViewPaired.setOnItemClickListener(listItemClickedonPaired);
   }
 
-  private void getPairedDevices() {
-    Set<BluetoothDevice> pairedDevice = bluetoothAdapter.getBondedDevices();
-    if (pairedDevice.size() > 0) {
-      for (BluetoothDevice device : pairedDevice) {
-        arrayListpaired.add(device.getName() + " pareado anteriormente");
-        arrayListPairedBluetoothDevices.add(device);
-      }
-    }
-    adapter.notifyDataSetChanged();
-  }
-
+  // Lista de dispositivos achados
   class ListItemClicked implements AdapterView.OnItemClickListener {
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-      //FIXME AQUI FOI MUDADO
-      bdDevice = arrayListPairedBluetoothDevices.get(position);
+      bdDevice = arrayListBluetoothDevices.get(position);
       Log.i("Log", "The dvice : " + bdDevice.toString());
       /*
        * here below we can do pairing without calling the callthread(), we can directly call the
@@ -140,28 +121,6 @@ public class MainActivity extends AppCompatActivity implements Serializable {
     }
   }
 
-  class ListItemClickedonPaired implements AdapterView.OnItemClickListener {
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-      //FIXME AQUI FOI MUDADO
-      bdDevice = arrayListBluetoothDevices.get(position);
-      try {
-        Boolean removeBonding = createBond(bdDevice);
-        if (removeBonding) {
-          //Chama a atividade nova
-          chamaAtividadeConectada(bdDevice);
-
-        }
-
-
-        Log.i("Log", "Removed" + removeBonding);
-      } catch (Exception e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-    }
-  }
-
   private BluetoothSocket connect(BluetoothDevice bdDevice) {
     BluetoothSocket socket = null;
     try {
@@ -173,11 +132,8 @@ public class MainActivity extends AppCompatActivity implements Serializable {
     return socket;
   }
 
-  ;
-
-
   public boolean removeBond(BluetoothDevice btDevice)
-      throws Exception {
+    throws Exception {
     Class btClass = Class.forName("android.bluetooth.BluetoothDevice");
     Method removeBondMethod = btClass.getMethod("removeBond");
     Boolean returnValue = (Boolean) removeBondMethod.invoke(btDevice);
@@ -186,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
 
 
   public boolean createBond(BluetoothDevice btDevice)
-      throws Exception {
+    throws Exception {
     Class class1 = Class.forName("android.bluetooth.BluetoothDevice");
     Method createBondMethod = class1.getMethod("createBond");
     Boolean returnValue = (Boolean) createBondMethod.invoke(btDevice);
@@ -203,6 +159,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
           break;
         case R.id.buttonSearch:
           arrayListBluetoothDevices.clear();
+          detectedAdapter.notifyDataSetChanged();
           startSearching();
           break;
         case R.id.buttonOff:
@@ -242,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
               flag = false;
             }
           }
-          if (flag == true) {
+          if (flag) {
             detectedAdapter.add(device.getName() + "\n" + device.getAddress());
             arrayListBluetoothDevices.add(device);
             detectedAdapter.notifyDataSetChanged();
@@ -296,6 +253,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
     Intent conectado = new Intent(MainActivity.this, ConectadaActivity.class);
     conectado.putExtra("device", device);
     startActivity(conectado);
+    bluetoothAdapter.cancelDiscovery();
     unregisterReceiver(myReceiver);
   }
 }
