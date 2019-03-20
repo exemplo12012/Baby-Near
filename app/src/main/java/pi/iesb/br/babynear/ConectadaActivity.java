@@ -166,7 +166,7 @@ public class ConectadaActivity extends AppCompatActivity implements Serializable
       byte[] buffer = new byte[256];
       int bytes;
       while (bluetoothGatt.readRemoteRssi()) {
-        if ( sinal < -10 ) {
+        if ( sinal < -35 ) {
           break;
         }
       }
