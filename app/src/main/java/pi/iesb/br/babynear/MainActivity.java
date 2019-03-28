@@ -2,7 +2,6 @@ package pi.iesb.br.babynear;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
@@ -24,7 +23,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements Serializable {
@@ -33,12 +31,10 @@ public class MainActivity extends AppCompatActivity implements Serializable {
   private static final long serialVersionUID = -5726768658971273029L;
 
   ListView listViewDetected;
-  ArrayList<String> arrayListpaired;
-  Button buttonSearch, buttonOn, buttonOff;
+  Button buttonSearch, buttonOn, buttonOff, buttonSettings;
   ArrayAdapter<String> detectedAdapter;
   static HandleSeacrh handleSeacrh;
   BluetoothDevice bdDevice;
-  BluetoothClass bdClass;
   ArrayList<BluetoothDevice> arrayListPairedBluetoothDevices;
   private ButtonClicked clicked;
   BluetoothAdapter bluetoothAdapter = null;
@@ -51,29 +47,29 @@ public class MainActivity extends AppCompatActivity implements Serializable {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    listViewDetected = (ListView) findViewById(R.id.listViewDetected);
-    buttonSearch = (Button) findViewById(R.id.buttonSearch);
-    buttonOn = (Button) findViewById(R.id.buttonOn);
-    buttonOff = (Button) findViewById(R.id.buttonOff);
-    arrayListpaired = new ArrayList<String>();
+    listViewDetected = findViewById(R.id.listViewDetected);
+    buttonSearch = findViewById(R.id.buttonSearch);
+    buttonOn = findViewById(R.id.buttonOn);
+    buttonOff = findViewById(R.id.buttonOff);
+    buttonSettings = findViewById(R.id.settings);
     bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     clicked = new ButtonClicked();
     handleSeacrh = new HandleSeacrh();
-    arrayListPairedBluetoothDevices = new ArrayList<BluetoothDevice>();
+    arrayListPairedBluetoothDevices = new ArrayList<>();
     /*
      * the above declaration is just for getting the paired bluetooth devices;
      * this helps in the removing the bond between paired devices.
      */
-    arrayListBluetoothDevices = new ArrayList<BluetoothDevice>();
-    detectedAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_single_choice);
+    arrayListBluetoothDevices = new ArrayList<>();
+    detectedAdapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_list_item_single_choice);
     listViewDetected.setAdapter(detectedAdapter);
     listItemClicked = new ListItemClicked();
     detectedAdapter.notifyDataSetChanged();
+
   }
 
   @Override
   protected void onStart() {
-    // TODO Auto-generated method stub
     super.onStart();
     // Quick permission check
     int permissionCheck = this.checkSelfPermission("Manifest.permission.ACCESS_FINE_LOCATION");
@@ -94,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
     buttonOn.setOnClickListener(clicked);
     buttonSearch.setOnClickListener(clicked);
     buttonOff.setOnClickListener(clicked);
+    buttonSettings.setOnClickListener(clicked);
     listViewDetected.setOnItemClickListener(listItemClicked);
   }
 
@@ -165,10 +162,21 @@ public class MainActivity extends AppCompatActivity implements Serializable {
         case R.id.buttonOff:
           offBluetooth();
           break;
+        case R.id.settings:
+          settingsActivity();
+          break;
         default:
           break;
       }
     }
+  }
+
+  private void settingsActivity() {
+    bluetoothAdapter.cancelDiscovery();
+    Intent configuracao = new Intent(this, SettingsActivity.class);
+    configuracao.putExtra(SettingsActivity.EXTRA_NO_HEADERS, true);
+    configuracao.putExtra(SettingsActivity.EXTRA_SHOW_FRAGMENT, SettingsActivity.GeneralPreferenceFragment.class.getName());
+    startActivity(configuracao);
   }
 
   private BroadcastReceiver myReceiver = new BroadcastReceiver() {

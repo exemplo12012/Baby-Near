@@ -2,16 +2,12 @@ package pi.iesb.br.babynear;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
-import android.bluetooth.BluetoothProfile;
 import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -19,10 +15,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -37,8 +33,6 @@ import java.io.Serializable;
 import java.util.Random;
 import java.util.UUID;
 
-import static android.bluetooth.BluetoothAdapter.STATE_CONNECTED;
-
 /**
  * Created by henrique on 14/11/2017.
  */
@@ -48,6 +42,7 @@ public class ConectadaActivity extends AppCompatActivity implements Serializable
   private static final long serialVersionUID = 5890514926067136397L;
   Button btn_voltar;
   TextView txt_texto;
+  TextView txt_texto_configuracao;
   BluetoothDevice btDevice;
   BluetoothSocket btSocket;
   private static final String CHANNEL_ID = "BABY NEAR NOTIFICATION CHANNEL";
@@ -61,18 +56,24 @@ public class ConectadaActivity extends AppCompatActivity implements Serializable
   private boolean connected;
   private BluetoothGatt bluetoothGatt;
   private BluetoothGattCallback mGattCallback;
+  private Integer distanciaAtual = 0;
+  private Integer distanciaMaxPermitida;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     baseLayout = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.activity_conectado, null, false);
     setContentView(baseLayout);
-    btn_voltar = (Button) findViewById(R.id.btn_voltar);
-    txt_texto = (TextView) findViewById(R.id.txt_conectado);
+    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+    distanciaMaxPermitida = Integer.parseInt(settings.getString("distancia_max_permitida", "10"));
+    btn_voltar = findViewById(R.id.btn_voltar);
+    txt_texto = findViewById(R.id.txt_conectado);
+    txt_texto_configuracao = findViewById(R.id.txt_configuracao);
     btDevice = (BluetoothDevice) getIntent().getExtras().get("device");
     btSocket = (BluetoothSocket) getIntent().getExtras().get("socket");
 
     txt_texto.setText(btDevice.getName() + " foi conectado!!");
+    txt_texto_configuracao.setText("Distância aproximada máxima permitida: " + distanciaMaxPermitida + " metros");
 
     btn_voltar.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -91,12 +92,31 @@ public class ConectadaActivity extends AppCompatActivity implements Serializable
           @Override
           public void run() {
             sinal = rssi;
-            txt_texto.setText(btDevice.getName() + " foi conectado!!\n RSSI: " + rssi + "dBm" );
+            getDistanceFromSinal(sinal);
+            txt_texto.setText(btDevice.getName() + " foi conectado!!\n " +
+              "RSSI: " + rssi + "dBm\n" +
+              "A criança está a aproximadamente " + distanciaAtual + " metros" );
           }
         });
       }
     };
 
+  }
+
+  private void getDistanceFromSinal(int sinal) {
+    if ( sinal > -5 ) {
+      distanciaAtual = 0;
+    } else if ( sinal > -10 ) {
+      distanciaAtual = 3;
+    } else if ( sinal > -15 ) {
+      distanciaAtual = 5;
+    } else if ( sinal > -20 ) {
+      distanciaAtual = 7;
+    } else if ( sinal > -30 ) {
+      distanciaAtual = 9;
+    } else {
+      distanciaAtual = 11;
+    }
   }
 
   private void createNotificationChannel() {
@@ -166,7 +186,13 @@ public class ConectadaActivity extends AppCompatActivity implements Serializable
       byte[] buffer = new byte[256];
       int bytes;
       while (bluetoothGatt.readRemoteRssi()) {
-        if ( sinal < -35 ) {
+        if ( distanciaAtual > distanciaMaxPermitida ) {
+          try {
+            outputStream.write("D".getBytes());
+            outputStream.flush();
+          } catch (IOException e) {
+            break;
+          }
           break;
         }
       }
