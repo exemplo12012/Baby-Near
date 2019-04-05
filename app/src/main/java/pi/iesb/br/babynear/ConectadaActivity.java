@@ -58,6 +58,7 @@ public class ConectadaActivity extends AppCompatActivity implements Serializable
   private BluetoothGattCallback mGattCallback;
   private Integer distanciaAtual = 0;
   private Integer distanciaMaxPermitida;
+  private boolean reproduzirAudio;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -66,6 +67,8 @@ public class ConectadaActivity extends AppCompatActivity implements Serializable
     setContentView(baseLayout);
     SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
     distanciaMaxPermitida = Integer.parseInt(settings.getString("distancia_max_permitida", "10"));
+    reproduzirAudio = settings.getBoolean("gravacao_baby_near", true);
+
     btn_voltar = findViewById(R.id.btn_voltar);
     txt_texto = findViewById(R.id.txt_conectado);
     txt_texto_configuracao = findViewById(R.id.txt_configuracao);
@@ -170,6 +173,10 @@ public class ConectadaActivity extends AppCompatActivity implements Serializable
 
       inputStream = tmpIn;
       outputStream = tmpOut;
+
+      String configuracao = reproduzirAudio ? "N" : "R";
+      outputStream.write(configuracao.getBytes());
+      outputStream.flush();
 
       connected = true;
 

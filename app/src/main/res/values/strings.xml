@@ -2,11 +2,11 @@
     <string name="app_name">Baby Near</string>
     <string name="channel_name">Notificação Baby Near</string>
     <string name="channel_description">Canal de notificações do Baby Near</string>
-    <string name="on">Ligado</string>
+    <string name="on">Ligar Bluetooth</string>
     <string name="bluetooth">Bluetooth</string>
     <string name="off">Desligado</string>
     <string name="search">Procurar</string>
-    <string name="bluetooth_off">Bluetooth desligado</string>
+    <string name="bluetooth_off">Desligar Bluetooth</string>
     <string name="settings">Configurações</string>
     <string name="title_activity_settings">Configuração</string>
 
