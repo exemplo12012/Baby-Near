@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
   private static final long serialVersionUID = -5726768658971273029L;
 
   ListView listViewDetected;
-  Button buttonSearch, buttonOn, buttonOff, buttonSettings;
+  Button buttonSearch, buttonOn, buttonSettings;
   ArrayAdapter<String> detectedAdapter;
   static HandleSeacrh handleSeacrh;
   BluetoothDevice bdDevice;
@@ -50,7 +50,6 @@ public class MainActivity extends AppCompatActivity implements Serializable {
     listViewDetected = findViewById(R.id.listViewDetected);
     buttonSearch = findViewById(R.id.buttonSearch);
     buttonOn = findViewById(R.id.buttonOn);
-    buttonOff = findViewById(R.id.buttonOff);
     buttonSettings = findViewById(R.id.settings);
     bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     clicked = new ButtonClicked();
@@ -89,7 +88,6 @@ public class MainActivity extends AppCompatActivity implements Serializable {
 
     buttonOn.setOnClickListener(clicked);
     buttonSearch.setOnClickListener(clicked);
-    buttonOff.setOnClickListener(clicked);
     buttonSettings.setOnClickListener(clicked);
     listViewDetected.setOnItemClickListener(listItemClicked);
   }
@@ -159,9 +157,6 @@ public class MainActivity extends AppCompatActivity implements Serializable {
           detectedAdapter.notifyDataSetChanged();
           startSearching();
           break;
-        case R.id.buttonOff:
-          offBluetooth();
-          break;
         case R.id.settings:
           settingsActivity();
           break;
@@ -195,9 +190,9 @@ public class MainActivity extends AppCompatActivity implements Serializable {
           e.printStackTrace();
         }
 
-        if (arrayListBluetoothDevices.size() < 1) // this checks if the size of bluetooth device is 0,then add the
-        {                                      // device to the arraylist.
-          detectedAdapter.add(device.getName() + "\n" + device.getAddress());
+        String nome = device.getName() == null || device.getName().equals("null") ? "Dispositivo sem nome" : device.getName();
+        if (arrayListBluetoothDevices.size() < 1)  {
+          detectedAdapter.add(nome + "\n" + device.getAddress());
           arrayListBluetoothDevices.add(device);
           detectedAdapter.notifyDataSetChanged();
         } else {
@@ -208,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
             }
           }
           if (flag) {
-            detectedAdapter.add(device.getName() + "\n" + device.getAddress());
+            detectedAdapter.add(nome + "\n" + device.getAddress());
             arrayListBluetoothDevices.add(device);
             detectedAdapter.notifyDataSetChanged();
           }

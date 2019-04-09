@@ -7,8 +7,6 @@
         android:summaryOn="Quando o dispositivo estiver fora da zona segura, reproduzir aúdio gravado"
         android:title="Habilitar reprodução da gravação" />
 
-    <!-- NOTE: EditTextPreference accepts EditText attributes. -->
-    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
     <EditTextPreference
         android:capitalize="words"
         android:defaultValue="Informações de emergência"
@@ -19,9 +17,10 @@
         android:singleLine="false"
         android:title="Texto exibido por Tag" />
 
-    <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
-         dismiss it. -->
-    <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
+    <Preference
+        android:title="Gravar Tag"
+        android:key="gravarTag" />
+
     <ListPreference
         android:defaultValue="10"
         android:entries="@array/settings_list_preference_titles"

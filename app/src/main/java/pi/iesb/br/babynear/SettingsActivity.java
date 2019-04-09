@@ -13,6 +13,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -36,6 +37,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setupActionBar();
+
   }
 
   /**
@@ -164,6 +166,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
       super.onCreate(savedInstanceState);
       addPreferencesFromResource(R.xml.pref_general);
       setHasOptionsMenu(true);
+      Preference gravarTag = findPreference("gravarTag");
+      gravarTag.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        @Override
+        public boolean onPreferenceClick (Preference preference) {
+          Toast.makeText(getContext(), "Aee carai, apertou essa porra", Toast.LENGTH_LONG).show();
+          return true;
+        }
+      });
 
       // Bind the summaries of EditText/List/Dialog/Ringtone preferences
       // to their values. When their values change, their summaries are

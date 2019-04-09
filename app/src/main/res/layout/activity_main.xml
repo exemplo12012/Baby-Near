@@ -8,25 +8,22 @@
         android:id="@+id/buttonOn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/on" />
+        android:text="@string/on"
+        android:textAllCaps="false" />
 
     <Button
         android:id="@+id/buttonSearch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/search" />
-
-    <Button
-        android:id="@+id/buttonOff"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/bluetooth_off" />
+        android:text="@string/search"
+        android:textAllCaps="false" />
 
     <Button
         android:id="@+id/settings"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/settings" />
+        android:text="@string/settings"
+        android:textAllCaps="false" />
 
     <ListView
         android:id="@+id/listViewDetected"
