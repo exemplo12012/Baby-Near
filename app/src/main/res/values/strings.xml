@@ -9,11 +9,19 @@
     <string name="gravarTag">Gravar texto na Tag</string>
     <string name="bluetooth_off">Desligar Bluetooth</string>
     <string name="settings">Configurações</string>
+    <string name="tag">Gerenciamento da Tag NFC</string>
     <string name="title_activity_settings">Configuração</string>
 
     <!-- Strings related to Settings -->
 
     <!-- Example General settings -->
     <string name="pref_header_general">General</string>
+
+    <string name="message_write_error">Erro na escrita da Tag!</string>
+    <string name="message_write_success">Tag escrita com sucesso!</string>
+    <string name="message_write_progress">Escrevendo na tag…</string>
+    <string name="message_write_tag">Escrever na tag</string>
+    <string name="message_tap_tag">Aproxime o celular na tag</string>
+    <string name="hint_message">Message</string>
 
 </resources>

@@ -19,6 +19,13 @@
         android:textAllCaps="false" />
 
     <Button
+        android:id="@+id/tag"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/tag"
+        android:textAllCaps="false" />
+
+    <Button
         android:id="@+id/settings"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

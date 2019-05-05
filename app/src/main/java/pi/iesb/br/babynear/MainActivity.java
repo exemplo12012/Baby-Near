@@ -25,13 +25,15 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import pi.iesb.br.babynear.nfc.WriteTagActivity;
+
 public class MainActivity extends AppCompatActivity implements Serializable {
 
 
   private static final long serialVersionUID = -5726768658971273029L;
 
   ListView listViewDetected;
-  Button buttonSearch, buttonOn, buttonSettings;
+  Button buttonSearch, buttonOn, buttonSettings, buttonTag;
   ArrayAdapter<String> detectedAdapter;
   static HandleSeacrh handleSeacrh;
   BluetoothDevice bdDevice;
@@ -51,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
     buttonSearch = findViewById(R.id.buttonSearch);
     buttonOn = findViewById(R.id.buttonOn);
     buttonSettings = findViewById(R.id.settings);
+    buttonTag = findViewById(R.id.tag);
     bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     clicked = new ButtonClicked();
     handleSeacrh = new HandleSeacrh();
@@ -89,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements Serializable {
     buttonOn.setOnClickListener(clicked);
     buttonSearch.setOnClickListener(clicked);
     buttonSettings.setOnClickListener(clicked);
+    buttonTag.setOnClickListener(clicked);
     listViewDetected.setOnItemClickListener(listItemClicked);
   }
 
@@ -160,6 +164,9 @@ public class MainActivity extends AppCompatActivity implements Serializable {
         case R.id.settings:
           settingsActivity();
           break;
+        case R.id.tag:
+          tagActivity();
+          break;
         default:
           break;
       }
@@ -172,6 +179,12 @@ public class MainActivity extends AppCompatActivity implements Serializable {
     configuracao.putExtra(SettingsActivity.EXTRA_NO_HEADERS, true);
     configuracao.putExtra(SettingsActivity.EXTRA_SHOW_FRAGMENT, SettingsActivity.GeneralPreferenceFragment.class.getName());
     startActivity(configuracao);
+  }
+
+  private void tagActivity() {
+    bluetoothAdapter.cancelDiscovery();
+    Intent tag = new Intent(MainActivity.this, WriteTagActivity.class);
+    startActivity(tag);
   }
 
   private BroadcastReceiver myReceiver = new BroadcastReceiver() {
