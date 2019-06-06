@@ -204,6 +204,9 @@ public class MainActivity extends AppCompatActivity implements Serializable {
         }
 
         String nome = device.getName() == null || device.getName().equals("null") ? "Dispositivo sem nome" : device.getName();
+        if ( nome.equals("HC-05") ) {
+          nome = "Baby Near";
+        }
         if (arrayListBluetoothDevices.size() < 1)  {
           detectedAdapter.add(nome + "\n" + device.getAddress());
           arrayListBluetoothDevices.add(device);

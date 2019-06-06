@@ -190,8 +190,6 @@ public class ConectadaActivity extends AppCompatActivity implements Serializable
 
     @Override
     protected Boolean doInBackground(Void... voids) {
-      byte[] buffer = new byte[256];
-      int bytes;
       while (bluetoothGatt.readRemoteRssi()) {
         if ( distanciaAtual > distanciaMaxPermitida ) {
           try {
